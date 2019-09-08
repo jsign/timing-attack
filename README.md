@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/jsign/timing-attack)](https://goreportcard.com/report/github.com/jsign/timing-attack)
+
 # Timing-attack
 
 [Timing-attack](https://en.wikipedia.org/wiki/Timing_attack) is a proof of concept of a type of side-channel attack where time metadata is use to leak information about executions. In particular, network API calls are explored to identify tiny latencies variations to assert with high-confidence some facts about different request cases.
