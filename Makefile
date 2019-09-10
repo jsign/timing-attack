@@ -1,11 +1,9 @@
-build: build-server build-attacker
+build: ensure-bin build-server build-attacker
 
 build-server:
-	@mkdir -p bin
 	@go build -o ./bin github.com/jsign/timing-attack/cmd/server
 
 build-attacker:
-	@mkdir -p bin
 	@go build -o ./bin github.com/jsign/timing-attack/cmd/attacker
 
 run-server: build-server
@@ -14,7 +12,10 @@ run-server: build-server
 run-attacker: build-attacker
 	@./bin/attacker --debug
 
+ensure-bin:
+	@mkdir -p bin
+
 clean:
 	@rm -rf bin
 
-.PHONY: build build-server build-attacker run-server run-attacker clean
+.PHONY: build build-server build-attacker run-server run-attacker ensure-bin clean
