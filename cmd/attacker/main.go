@@ -10,15 +10,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	// experimentCount is how many rounds of request are used
-	// to measure latency of a request
-	experimentCount = 10
-)
-
 var (
-	addr  = flag.String("serveraddr", "http://localhost:3001", "server address")
-	debug = flag.Bool("debug", false, "debug mode")
+	addr       = flag.String("serveraddr", "http://localhost:3001", "server address")
+	debug      = flag.Bool("debug", false, "debug mode")
+	iterations = flag.Int("iter", 100, "iterations to execute per case")
 )
 
 func main() {
@@ -51,7 +46,7 @@ func main() {
 		}
 	}
 
-	res, err := measure.Measure(reqs, experimentCount)
+	res, err := measure.Measure(reqs, *iterations)
 	if err != nil {
 		logger.Fatalf("error while measuring test cases: %+v", err)
 	}
