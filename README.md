@@ -8,9 +8,9 @@
 This proof of concept is separated in two parts: _server_ and _attacker_.
 
 ## Server
-The _server_ is a simple webserver mock which simulates an API login, where first the user is retrieved by email from a database, and then, if exists, a password checksum is done. The database query and the checksum comparation are mocked by different `time.Sleep` calls with reasonable order-magnitude values.
+The _server_ is a simple webserver mock which simulates an API login, where first the user is retrieved by email from a database, and if exists a password checksum is done. The database query and the checksum comparation are mocked by different `time.Sleep` calls with reasonable order-magnitude values.
 
-Also, base-latencies and standar-deviation values can be configured to add noise to the total request latency to make it more realistic.
+Also, base-latencies and standard-deviation values can be configured to add noise to the total request latency to make it more realistic.
 
 ## Attacker
 The _attacker_ is a tool which using multiple test cases of emails for logins, makes an statistical analysis to conclude if a particular test-case has a meaningful statistical difference in latency to conclude something about the implementation runtime path.
@@ -32,7 +32,7 @@ DEBU[0004] Median latency for foo@fake.com is 15.94ms (-2.39%
 ```
 
 # Further work
-This is just an initial exploration of the problem. Further work might improve significantly precision, performance, configurability, and enabling to use attacker as a library rather than a tool.
+This is just an initial exploration of the problem. Further work might improve significantly precision, performance, configurability, parameters-range stats, and enabling to use attacker as a library rather than a tool.
 
 # License
 timing-attack is licenced under the MIT license.
