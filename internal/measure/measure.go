@@ -2,6 +2,8 @@ package measure
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"math"
 	"net"
 	"net/http"
@@ -28,6 +30,8 @@ var (
 			KeepAlive: 24 * time.Hour,
 			DualStack: true,
 		}).DialContext,
+		MaxIdleConns:    100,
+		IdleConnTimeout: 10 * time.Second,
 	}
 )
 
@@ -72,6 +76,7 @@ func measureLatencies(r *http.Request, count int) ([]int64, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error while doing roundtrip: %w", err)
 		}
+		io.Copy(ioutil.Discard, res.Body)
 		err = res.Body.Close()
 		if err != nil {
 			return nil, fmt.Errorf("error closing response body: %w", err)
