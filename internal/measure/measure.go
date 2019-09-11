@@ -2,7 +2,6 @@ package measure
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -10,6 +9,8 @@ import (
 	"net/http/httptrace"
 	"sync"
 	"time"
+
+	"golang.org/x/xerrors"
 )
 
 var (
@@ -45,7 +46,7 @@ func Measure(reqs []http.Request, perReqCount int, concurrency int) ([][]int64, 
 			}
 		case err := <-errChan:
 			cancel()
-			return [][]int64{}, fmt.Errorf("error while measuring latency in request %d: %w", i, err)
+			return [][]int64{}, xerrors.Errorf("error while measuring latency in request %d: %w", i, err)
 		}
 	}
 
@@ -95,12 +96,12 @@ func measureLatencies(r *http.Request, count int) ([]int64, error) {
 
 		res, err := transport.RoundTrip(r)
 		if err != nil {
-			return nil, fmt.Errorf("error while doing roundtrip: %w", err)
+			return nil, xerrors.Errorf("error while doing roundtrip: %w", err)
 		}
 		io.Copy(ioutil.Discard, res.Body)
 		err = res.Body.Close()
 		if err != nil {
-			return nil, fmt.Errorf("error closing response body: %w", err)
+			return nil, xerrors.Errorf("error closing response body: %w", err)
 		}
 
 		wg.Wait()
