@@ -25,14 +25,36 @@ var (
 )
 
 // Measure latencies for reqs and return results
-func Measure(reqs []http.Request, perReqCount int) ([][]int64, error) {
+func Measure(reqs []http.Request, perReqCount int, concurrency int) ([][]int64, error) {
 	reqLatencies := make([][]int64, len(reqs))
-	for i := range reqs {
-		latencies, err := measureLatencies(&reqs[i], perReqCount)
-		if err != nil {
+
+	workerRes := make(chan [][]int64, concurrency)
+	errChan := make(chan error)
+	for i := 0; i < concurrency; i++ {
+		go func() {
+			data := make([][]int64, len(reqs))
+			for i := range reqs {
+				latencies, err := measureLatencies(&reqs[i], perReqCount/concurrency)
+				if err != nil {
+					errChan <- err
+					return
+				}
+				data[i] = latencies
+			}
+
+			workerRes <- data
+		}()
+	}
+
+	for i := 0; i < concurrency; i++ {
+		select {
+		case newData := <-workerRes:
+			for i := range newData {
+				reqLatencies[i] = append(reqLatencies[i], newData[i]...)
+			}
+		case err := <-errChan:
 			return [][]int64{}, fmt.Errorf("error while measuring latency in request %d: %w", i, err)
 		}
-		reqLatencies[i] = latencies
 	}
 
 	return reqLatencies, nil

@@ -19,6 +19,7 @@ var (
 	addr        = flag.String("serveraddr", "http://localhost:3001", "server address")
 	debug       = flag.Bool("debug", false, "debug mode")
 	maxIterScan = flag.Int("maxIterScan", 10000, "maximum iterations during scan")
+	concurreny  = flag.Int("concurrency", 8, "concurrency level to make measurements")
 )
 
 func main() {
@@ -41,7 +42,7 @@ func main() {
 	accumulatedData := make([][]int64, len(cases))
 	accumulatedIterations := 0
 	for it := minIterations; it <= *maxIterScan; it += minIterations {
-		newData, err := measure.Measure(reqs, it)
+		newData, err := measure.Measure(reqs, it, *concurreny)
 		if err != nil {
 			logger.Fatalf("error while measuring test cases: %+v", err)
 		}
