@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/xerrors"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -34,6 +34,9 @@ func Measure(reqs []http.Request, perReqCount int, concurrency int) ([][]int64, 
 
 	workerRes := make(chan [][]int64, concurrency)
 	errChan := make(chan error)
+	defer close(workerRes)
+	defer close(errChan)
+
 	for i := 0; i < concurrency; i++ {
 		go workerMeasure(ctx, reqs, workerRes, errChan, perReqCount/concurrency)
 	}
@@ -46,7 +49,7 @@ func Measure(reqs []http.Request, perReqCount int, concurrency int) ([][]int64, 
 			}
 		case err := <-errChan:
 			cancel()
-			return [][]int64{}, xerrors.Errorf("error while measuring latency in request %d: %w", i, err)
+			return [][]int64{}, errors.Errorf("error while measuring latency in request %d: %w", i, err)
 		}
 	}
 
@@ -96,12 +99,12 @@ func measureLatencies(r *http.Request, count int) ([]int64, error) {
 
 		res, err := transport.RoundTrip(r)
 		if err != nil {
-			return nil, xerrors.Errorf("error while doing roundtrip: %w", err)
+			return nil, errors.Errorf("error while doing roundtrip: %w", err)
 		}
 		io.Copy(ioutil.Discard, res.Body)
 		err = res.Body.Close()
 		if err != nil {
-			return nil, xerrors.Errorf("error closing response body: %w", err)
+			return nil, errors.Errorf("error closing response body: %w", err)
 		}
 
 		wg.Wait()
