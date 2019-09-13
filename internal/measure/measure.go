@@ -27,53 +27,48 @@ var (
 )
 
 // Measure latencies for reqs and return results
-func Measure(reqs []http.Request, perReqCount int, concurrency int) ([][]int64, error) {
-	reqLatencies := make([][]int64, len(reqs))
+func Measure(req http.Request, count int, concurrency int) ([]int64, error) {
+	reqLatencies := make([]int64, count)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	workerRes := make(chan [][]int64, concurrency)
+	workerRes := make(chan []int64, concurrency)
 	errChan := make(chan error)
 	defer close(workerRes)
 	defer close(errChan)
 
 	for i := 0; i < concurrency; i++ {
-		go workerMeasure(ctx, reqs, workerRes, errChan, perReqCount/concurrency)
+		go workerMeasure(ctx, req, workerRes, errChan, count/concurrency)
 	}
 
 	for i := 0; i < concurrency; i++ {
 		select {
 		case newData := <-workerRes:
-			for i := range newData {
-				reqLatencies[i] = append(reqLatencies[i], newData[i]...)
-			}
+			reqLatencies = append(reqLatencies, newData...)
+
 		case err := <-errChan:
 			cancel()
-			return [][]int64{}, errors.Errorf("error while measuring latency in request %d: %w", i, err)
+			return []int64{}, errors.Errorf("error while measuring latency in request %d: %w", i, err)
 		}
 	}
 
 	return reqLatencies, nil
 }
 
-func workerMeasure(ctx context.Context, reqs []http.Request, resChan chan<- [][]int64, errChan chan<- error, count int) {
+func workerMeasure(ctx context.Context, req http.Request, resChan chan<- []int64, errChan chan<- error, count int) {
 	select {
 	case <-ctx.Done():
 		return
 	default:
 	}
 
-	data := make([][]int64, len(reqs))
-	for i := range reqs {
-		latencies, err := measureLatencies(&reqs[i], count)
-		if err != nil {
-			errChan <- err
-			return
-		}
-		data[i] = latencies
+	latencies, err := measureLatencies(&req, count)
+	if err != nil {
+		errChan <- err
+		return
 	}
 
-	resChan <- data
+	resChan <- latencies
 }
 
 func measureLatencies(r *http.Request, count int) ([]int64, error) {

@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/jsign/timing-attack/internal/measure"
-	"github.com/jsign/timing-attack/internal/stats"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -32,27 +31,26 @@ func main() {
 		logger.SetLevel(log.DebugLevel)
 	}
 
-	cases := []string{
-		"correct@email.com",
-		"whatever@fake.com",
-		"foo@fake.com",
-	}
+	baseCase := "whatever@fake.com"
+	targetCase := "correct@email.com"
 
-	reqs := generateRequests(cases)
-	accumulatedData := make([][]int64, len(cases))
+	reqs := generateRequests([]string{baseCase, targetCase})
+	baseReq, targetReq := reqs[0], reqs[1]
+
+	var baseData, targetData []int64
 	accumulatedIterations := 0
 	for it := minIterations; it <= *maxIterScan; it += minIterations {
-		newData, err := measure.Measure(reqs, it, *concurreny)
+		newBaseData, err := measure.Measure(baseReq, it, *concurreny)
+		newTargetData, err := measure.Measure(targetReq, it, *concurreny)
 		if err != nil {
 			logger.Fatalf("error while measuring test cases: %+v", err)
 		}
-		for i := range newData {
-			accumulatedData[i] = append(accumulatedData[i], newData[i]...)
-		}
+		baseData = append(baseData, newBaseData...)
+		targetData = append(targetData, newTargetData...)
 		accumulatedIterations += it
 
 		logger.Debugf("Total of %v iterations:\n", accumulatedIterations)
-		printStats(logger, cases, stats.Calculate(accumulatedData))
+		// printStats(logger, baseCase, targetCase, stats.Calculate(accumulatedData))
 
 	}
 }
@@ -74,12 +72,12 @@ func generateRequests(cases []string) []http.Request {
 	return reqs
 }
 
-func printStats(logger *log.Logger, cases []string, s stats.Stats) {
-	logger.Debugf("\tMax median latency: %s in %.2fms", cases[s.MaxMedianIndex], float64(s.MaxMedian)/1000000)
-	logger.Debugf("\tBase average latency is: %.2fms", float64(s.BaseAvg)/1000000)
-	logger.Debugf("\tBase stddev is: %.2fms", float64(s.BaseStdDev)/1000000)
-	for i := range s.Medians {
-		latencyRatio := float64(s.Medians[i]-s.BaseAvg) / float64(s.BaseStdDev) * 100
-		logger.Debugf("\tMedian latency for %s is %.2fms (%.2f%%)", cases[i], float64(s.Medians[i])/1000000, latencyRatio)
-	}
-}
+// func printStats(logger *log.Logger, baseCase, targetCase string, s stats.Stats) {
+// 	logger.Debugf("\tMax median latency: %s in %.2fms", cases[s.MaxMedianIndex], float64(s.MaxMedian)/1000000)
+// 	logger.Debugf("\tBase average latency is: %.2fms", float64(s.BaseAvg)/1000000)
+// 	logger.Debugf("\tBase stddev is: %.2fms", float64(s.BaseStdDev)/1000000)
+// 	for i := range s.Medians {
+// 		latencyRatio := float64(s.Medians[i]-s.BaseAvg) / float64(s.BaseStdDev) * 100
+// 		logger.Debugf("\tMedian latency for %s is %.2fms (%.2f%%)", cases[i], float64(s.Medians[i])/1000000, latencyRatio)
+// 	}
+// }
