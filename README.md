@@ -39,6 +39,8 @@ Further work might involve:
 - automatic concurrency decision (more concurrency, more jitter)
 - graphs with data
 - rate limiting
+- pair sampling analysis
+- exploration of network latency models
 
 # License
 timing-attack is licenced under the [MIT license](https://github.com/jsign/timing-attack/blob/master/LICENSE).
