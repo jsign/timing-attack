@@ -41,4 +41,4 @@ Further work might involve:
 - rate limiting
 
 # License
-timing-attack is licenced under the (MIT license)[https://github.com/jsign/timing-attack/blob/master/LICENSE].
+timing-attack is licenced under the [MIT license](https://github.com/jsign/timing-attack/blob/master/LICENSE).
