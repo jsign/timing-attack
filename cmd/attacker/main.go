@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/jsign/timing-attack/internal/measure"
+	"github.com/jsign/timing-attack/internal/stats"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -50,8 +51,12 @@ func main() {
 		accumulatedIterations += it
 
 		logger.Debugf("Total of %v iterations:\n", accumulatedIterations)
-		// printStats(logger, baseCase, targetCase, stats.Calculate(accumulatedData))
 
+		s, err := stats.Calculate(baseData, targetData)
+		if err != nil {
+			logger.Fatalf("error while calculating stats: %v", err)
+		}
+		printStats(logger, baseCase, targetCase, s)
 	}
 }
 
@@ -72,12 +77,7 @@ func generateRequests(cases []string) []http.Request {
 	return reqs
 }
 
-// func printStats(logger *log.Logger, baseCase, targetCase string, s stats.Stats) {
-// 	logger.Debugf("\tMax median latency: %s in %.2fms", cases[s.MaxMedianIndex], float64(s.MaxMedian)/1000000)
-// 	logger.Debugf("\tBase average latency is: %.2fms", float64(s.BaseAvg)/1000000)
-// 	logger.Debugf("\tBase stddev is: %.2fms", float64(s.BaseStdDev)/1000000)
-// 	for i := range s.Medians {
-// 		latencyRatio := float64(s.Medians[i]-s.BaseAvg) / float64(s.BaseStdDev) * 100
-// 		logger.Debugf("\tMedian latency for %s is %.2fms (%.2f%%)", cases[i], float64(s.Medians[i])/1000000, latencyRatio)
-// 	}
-// }
+func printStats(logger *log.Logger, baseCase, targetCase string, s stats.Stats) {
+	logger.Debugf("\tBaseCI:   (%.3f, %.3f)", s.BaseCI.Left, s.BaseCI.Right)
+	logger.Debugf("\tTargetCI: (%.3f, %.3f)", s.TargetCI.Left, s.TargetCI.Right)
+}
