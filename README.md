@@ -13,7 +13,9 @@ The _server_ is a simple webserver mock which simulates an API login, where firs
 Also, base-latencies and standard-deviation values can be configured to add noise to the total request latency to make it more realistic.
 
 ## Attacker
-The _attacker_ is a tool which using multiple test cases of emails for logins, makes an statistical analysis to conclude if a particular test-case has a meaningful statistical difference in latency to conclude something about the implementation runtime path.
+The _attacker_ is a tool which compares a base and target cases. Both targets are analyzed for statistical differences in they mean latencies. A statistical-meaningful mean latency difference might imply both cases run different code paths in the server. The attacker gathers data by making request to the server with certain concurrency level (default 8).
+
+Currently, a live confidence interval at 95% is shown for each case (base and target). These confidence-intervals are shown live while more request (thus, data) is being gathered by the attacker. Eventually if bot confidence intervals are disjoint, we can be reasonably sure that the mean latency for each base and target cases are different.
 
 # Usage
 Terminal 1:
@@ -32,7 +34,16 @@ DEBU[0004] Median latency for foo@fake.com is 15.94ms (-2.39%
 ```
 
 # Further work
-This is just an initial exploration of the problem. Further work might improve significantly precision, performance, configurability, parameters-range stats, and enabling to use attacker as a library rather than a tool.
+This is just an initial exploration/play with the problem. 
+
+Further work might involve:
+- calculate p values for base vs target case
+- improve configurability of confidence-interval %
+- automatic stop when reasonable conclusion can be found
+- more modularization between data gathering, analysis, and visualization
+- automatic concurrency decision (more concurrency, more jitter)
+- graphs with data
+- rate limiting
 
 # License
-timing-attack is licenced under the MIT license.
+timing-attack is licenced under the (MIT license)[https://github.com/jsign/timing-attack/blob/master/LICENSE].
