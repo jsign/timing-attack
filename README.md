@@ -21,17 +21,12 @@ Currently, a live confidence interval at 95% is shown for each case (base and ta
 Terminal 1:
 ```
 timing-attack [master] % make run-server
+DEBU[0000] Base latency: 15ms                           
+DEBU[0000] Latency stdev: 5ms                           
+DEBU[0000] webserver listening...
 ```
 Terminal 2:
-```
-timing-attack [master] % make run-attacker
-DEBU[0004] Max median latency: correct@email.com in 17.17ms 
-DEBU[0004] Base average latency is: 16.06ms             
-DEBU[0004] Base stddev is: 5.15ms                       
-DEBU[0004] Median latency for correct@email.com is 17.17ms (21.54%) 
-DEBU[0004] Median latency for whatever@fake.com is 15.94ms (-2.44%) 
-DEBU[0004] Median latency for foo@fake.com is 15.94ms (-2.39%
-```
+![](attacker-demo.gif)
 
 # Further work
 This is just an initial exploration/play with the problem. 
