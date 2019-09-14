@@ -3,6 +3,8 @@ module github.com/jsign/timing-attack
 go 1.13
 
 require (
+	github.com/gosuri/uilive v0.0.3
+	github.com/mattn/go-isatty v0.0.9 // indirect
 	github.com/montanaflynn/stats v0.5.0
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2

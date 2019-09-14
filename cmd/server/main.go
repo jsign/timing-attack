@@ -30,6 +30,9 @@ func main() {
 		logger.SetLevel(log.DebugLevel)
 	}
 
+	logger.Debugf("Base latency: %dms", *baseLatency)
+	logger.Debugf("Latency stdev: %dms", *stdDev)
+
 	s := http.Server{
 		Addr:    fmt.Sprintf("localhost:%d", *port),
 		Handler: handler.NewNaiveComparator(logger, *baseLatency, *stdDev),

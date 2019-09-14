@@ -7,7 +7,7 @@ build-attacker:
 	@go build -o ./bin github.com/jsign/timing-attack/cmd/attacker
 
 run-server: build-server
-	@./bin/server --stddev 5 --baseLatency 15
+	@./bin/server --stddev 5 --baseLatency 15 --debug
 
 run-attacker: build-attacker
 	@./bin/attacker --debug

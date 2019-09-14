@@ -2,10 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
 
+	"github.com/gosuri/uilive"
 	"github.com/jsign/timing-attack/internal/measure"
 	"github.com/jsign/timing-attack/internal/stats"
 	log "github.com/sirupsen/logrus"
@@ -31,6 +33,9 @@ func main() {
 	if *debug {
 		logger.SetLevel(log.DebugLevel)
 	}
+	writer := uilive.New()
+	writer.Start()
+	defer writer.Stop()
 
 	baseCase := "whatever@fake.com"
 	targetCase := "correct@email.com"
@@ -50,13 +55,11 @@ func main() {
 		targetData = append(targetData, newTargetData...)
 		accumulatedIterations += it
 
-		logger.Debugf("Total of %v iterations:\n", accumulatedIterations)
-
 		s, err := stats.Calculate(baseData, targetData)
 		if err != nil {
 			logger.Fatalf("error while calculating stats: %v", err)
 		}
-		printStats(logger, baseCase, targetCase, s)
+		printStats(writer, accumulatedIterations, s)
 	}
 }
 
@@ -77,7 +80,6 @@ func generateRequests(cases []string) []http.Request {
 	return reqs
 }
 
-func printStats(logger *log.Logger, baseCase, targetCase string, s stats.Stats) {
-	logger.Debugf("\tBaseCI:   (%.3f, %.3f)", s.BaseCI.Left, s.BaseCI.Right)
-	logger.Debugf("\tTargetCI: (%.3f, %.3f)", s.TargetCI.Left, s.TargetCI.Right)
+func printStats(w *uilive.Writer, iterations int, s stats.Stats) {
+	fmt.Fprintf(w, "%4d iterations | Base Mean Latency CI (%.3f, %.3f) | Target Mean Latency CI: (%.3f, %.3f) | CI at 95%%\n", iterations, s.BaseCI.Left, s.BaseCI.Right, s.TargetCI.Left, s.TargetCI.Right)
 }
