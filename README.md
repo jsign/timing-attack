@@ -17,16 +17,8 @@ The _attacker_ is a tool which compares a base and target cases. Both targets ar
 
 Currently, a live confidence interval at 95% is shown for each case (base and target). These confidence-intervals are shown live while more request (thus, data) is being gathered by the attacker. Eventually if bot confidence intervals are disjoint, we can be reasonably sure that the mean latency for each base and target cases are different.
 
-# Usage
-Terminal 1:
-```
-timing-attack [master] % make run-server
-DEBU[0000] Base latency: 15ms                           
-DEBU[0000] Latency stdev: 5ms                           
-DEBU[0000] webserver listening...
-```
-Terminal 2:
-![](attacker-demo.gif)
+# Demo
+![](attacker-demo-v2.gif)
 
 # Further work
 This is just an initial exploration/play with the problem. 
