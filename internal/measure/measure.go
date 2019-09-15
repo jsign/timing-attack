@@ -28,7 +28,7 @@ var (
 
 // Measure latencies for reqs and return results
 func Measure(req http.Request, count int, concurrency int) ([]int64, error) {
-	reqLatencies := make([]int64, count)
+	var reqLatencies []int64
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
