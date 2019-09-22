@@ -10,7 +10,7 @@ run-server: build-server
 	@./bin/server --stddev 5 --baseLatency 15 --debug
 
 run-attacker: build-attacker
-	@./bin/attacker --concurrency 1 --debug
+	@./bin/attacker --concurrency 5 --debug
 
 ensure-bin:
 	@mkdir -p bin
