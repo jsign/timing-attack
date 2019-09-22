@@ -34,7 +34,6 @@ func (h loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	time.Sleep(noise * time.Millisecond)
 
-	time.Sleep(1 * time.Millisecond) // Get user from database by email
 	if email != h.correctEmail {
 		http.Error(w, "", http.StatusUnauthorized)
 		return
